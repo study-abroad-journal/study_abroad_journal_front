@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+.vite/
+
+# Next.js / Vite ビルド出力
+.next/
+dist/
+out/
+
+# 環境変数ファイル
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# ログ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
