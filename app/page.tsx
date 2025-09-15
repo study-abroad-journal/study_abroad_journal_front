@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import { User } from '@/types';
 import AuthModal from '@/components/AuthModal';
+import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {user ? (
         // ログイン後の簡単な確認画面
+        
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
