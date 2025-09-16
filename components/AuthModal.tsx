@@ -50,7 +50,6 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
       if (isLogin) {
         // --- ログイン処理 ---
         const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-        console.log('ログイン成功！');
         handleAuthSuccess(userCredential.user);
       } else {
         // --- サインアップ処理 ---
@@ -61,8 +60,13 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
             await updateProfile(auth.currentUser, {
                 displayName: formData.name,
             });
+
+            //以下、この部分にバックエンドにuserの情報を送るコードを書く
+
+            //↓firebaseのIDを取得するコード
+            //const idToken = await auth.currentUser.getIdToken();
+
         }
-        console.log('サインアップ成功！', userCredential.user);
         handleAuthSuccess(userCredential.user);
       }
       
