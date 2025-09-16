@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {user ? (
-        // ログイン後の簡単な確認画面
+        // ログイン後の簡単な確認画面。ここの部分にログイン後の画面を実装する
         
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">

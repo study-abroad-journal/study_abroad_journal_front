@@ -7,6 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { auth } from './firebaseConfig';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  updateProfile,
+  User as FirebaseUser
+} from "firebase/auth";
+
 interface AuthModalProps {
   onClose: () => void;
   onLogin: (user: User) => void;
@@ -19,18 +27,63 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
     password: '',
     name: '',
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simple mock authentication
-    const userData: User = {
-      id: Date.now().toString(),
-      email: formData.email,
-      name: formData.name || formData.email.split('@')[0],
+  const handleAuthSuccess = (firebaseUser: FirebaseUser) => {
+    const user: User = {
+      id: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      name: firebaseUser.displayName || formData.name || '',
     };
+    onLogin(user); 
     
-    onLogin(userData);
+  };
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // --- ログイン処理 ---
+        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        console.log('ログイン成功！');
+        handleAuthSuccess(userCredential.user);
+      } else {
+        // --- サインアップ処理 ---
+        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        
+        // ユーザープロファイルに名前を更新
+        if (auth.currentUser) {
+            await updateProfile(auth.currentUser, {
+                displayName: formData.name,
+            });
+        }
+        console.log('サインアップ成功！', userCredential.user);
+        handleAuthSuccess(userCredential.user);
+      }
+      
+    } catch (err: any) {
+      console.error("認証エラー:", err.message);
+      setError(getFirebaseErrorMessage(err.code));
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  // Firebaseのエラーコードを日本語メッセージに変換するヘルパー関数
+  const getFirebaseErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/invalid-email': return '無効なメールアドレスです。';
+      case 'auth/user-not-found': return 'このアカウントは見つかりませんでした。';
+      case 'auth/wrong-password': return 'パスワードが間違っています。';
+      case 'auth/email-already-in-use': return 'このメールアドレスは既に使用されています。';
+      case 'auth/weak-password': return 'パスワードは6文字以上で設定してください。';
+      default: return '認証に失敗しました。もう一度お試しください。';
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +92,8 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
       [e.target.name]: e.target.value,
     });
   };
+
+  
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -108,9 +163,10 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
 
           <Button
             type="submit"
+            disabled={loading}
             className="w-full bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
-            {isLogin ? 'ログイン' : 'サインアップ'}
+            {loading ? '処理中...' : (isLogin ? 'ログイン' : 'サインアップ')}
           </Button>
         </form>
 
