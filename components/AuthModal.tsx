@@ -41,42 +41,69 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
   };
 
 
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setError(null);
+  //   setLoading(true);
+
+  //   try {
+  //     if (isLogin) {
+  //       // --- ログイン処理 ---
+  //       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+  //       handleAuthSuccess(userCredential.user);
+  //     } else {
+  //       // --- サインアップ処理 ---
+  //       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        
+  //       // ユーザープロファイルに名前を更新
+  //       if (auth.currentUser) {
+  //           await updateProfile(auth.currentUser, {
+  //               displayName: formData.name,
+  //           });
+
+  //           //以下、この部分にバックエンドにuserの情報を送るコードを書く
+
+  //           //↓firebaseのIDを取得するコード
+  //           //const idToken = await auth.currentUser.getIdToken();
+
+  //       }
+  //       handleAuthSuccess(userCredential.user);
+  //     }
+      
+  //   } catch (err: any) {
+  //     console.error("認証エラー:", err.message);
+  //     setError(getFirebaseErrorMessage(err.code));
+  //   } finally {
+  //       setLoading(false);
+  //   }
+  // };
+
+  // ここから後で削除
+  // AuthModal.tsx 内の handleSubmit を差し替え（モックモード）
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      if (isLogin) {
-        // --- ログイン処理 ---
-        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-        handleAuthSuccess(userCredential.user);
-      } else {
-        // --- サインアップ処理 ---
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        
-        // ユーザープロファイルに名前を更新
-        if (auth.currentUser) {
-            await updateProfile(auth.currentUser, {
-                displayName: formData.name,
-            });
+      // --- モックユーザー ---
+      const mockUser: User = {
+        id: "mock-123",
+        email: formData.email || "test@example.com",
+        name: formData.name || "テストユーザー",
+      };
 
-            //以下、この部分にバックエンドにuserの情報を送るコードを書く
+      onLogin(mockUser);
+      onClose(); // モーダル閉じる
 
-            //↓firebaseのIDを取得するコード
-            //const idToken = await auth.currentUser.getIdToken();
-
-        }
-        handleAuthSuccess(userCredential.user);
-      }
-      
     } catch (err: any) {
-      console.error("認証エラー:", err.message);
-      setError(getFirebaseErrorMessage(err.code));
+      console.error("モック認証エラー:", err.message);
+      setError("モックログインに失敗しました");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
+// ここまで後で削除
 
   // Firebaseのエラーコードを日本語メッセージに変換するヘルパー関数
   const getFirebaseErrorMessage = (errorCode: string): string => {

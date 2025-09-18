@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { BookOpen } from 'lucide-react';
-import { User } from '@/types';
+import { DiaryEntry,User } from '@/types';
 import AuthModal from '@/components/AuthModal';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import DiaryForm from '@/components/DiaryForm';
+import DiaryMap from '@/components/DiaryMap';
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -23,23 +25,58 @@ export default function Home() {
   const closeAuthModal = () => {
     setShowAuthModal(false);
   };
+  const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
+  //今は localStorage.setItem に保存しているので、後でバックエンドとつなげるときに差し替え
+  const handleAddEntry = (entry: Omit<DiaryEntry, 'id'>) => {
+    const newEntry: DiaryEntry = {
+      ...entry,
+      id: Date.now().toString(),
+    };
+    const updatedEntries = [newEntry, ...diaryEntries];
+    setDiaryEntries(updatedEntries);
+    localStorage.setItem('diaryEntries', JSON.stringify(updatedEntries));
+  };
+  function handleSubmit(entry: Omit<DiaryEntry, 'id'>): void {
+    throw new Error('Function not implemented.');
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
       {user ? (
         // ログイン後の簡単な確認画面。ここの部分にログイン後の画面を実装する
-        
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Welcome Back
-            </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              ログインして留学日記を続けましょう
-            </p>
-            <p className="text-sm text-gray-500">
-              Hello, {user.name}!
-            </p>
+        <div className="p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    Welcome Back, {user.name}!
+                  </h1>
+                  <p className="text-gray-600 mt-2">
+                    Ready to continue your journey?
+                  </p>
+                </div>
+                <button
+                  onClick={() => setUser(null)}
+                  className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                >
+                  ログアウト
+                </button>
+              </div>
+
+              {/* 今後追加するコンポーネントのプレースホルダー */}
+              <div className="space-y-6">
+                <div className="rounded-lg p-8 text-center">
+                  <DiaryForm onSubmit={handleAddEntry} />
+                </div>
+
+                {/* DiaryMap をフォームの下に配置 */}
+                <div className="rounded-lg p-8 text-center">
+                  <DiaryMap entries={diaryEntries} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
