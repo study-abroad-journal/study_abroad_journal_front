@@ -131,14 +131,14 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
             <MapPin className="h-4 w-4" />
             <span>位置情報取得</span>
           </Button>
-          <Button
+          {/* <Button
             type="button"
-            variant="outline"
-            className="flex items-center space-x-2 bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+            onClick={() => setShowManualInput(!showManualInput)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            <Mic className="h-4 w-4" />
-            <span>音声入力</span>
-          </Button>
+            <Search className="h-4 w-4" />
+            <span>地名検索</span>
+          </Button> */}
         </div>
 
         {showAiCorrection && (

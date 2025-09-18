@@ -7,6 +7,8 @@ import AuthModal from '@/components/AuthModal';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import DiaryForm from '@/components/DiaryForm';
+import DiaryMap from '@/components/DiaryMap';
+
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -65,18 +67,14 @@ export default function Home() {
 
               {/* 今後追加するコンポーネントのプレースホルダー */}
               <div className="space-y-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="rounded-lg p-8 text-center">
                   <DiaryForm onSubmit={handleAddEntry} />
                 </div>
 
                 {/* DiaryMap をフォームの下に配置 */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">
-                    DiaryMap コンポーネント
-                  </h3>
-                  <p className="text-gray-500">地図表示エリア</p>
+                <div className="rounded-lg p-8 text-center">
+                  <DiaryMap entries={diaryEntries} />
                 </div>
-                
               </div>
             </div>
           </div>
