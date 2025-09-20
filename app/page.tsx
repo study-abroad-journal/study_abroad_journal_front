@@ -41,9 +41,19 @@ export default function Home() {
   };
 
   function handleAddEntry(entry: Omit<DiaryEntry, 'id'>): void {
-    throw new Error('Function not implemented.');
-  }
+  const newEntry: DiaryEntry = {
+    ...entry,
+    id: Date.now().toString(), // 仮ID
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 
+  setDiaryEntries((prev) => [newEntry, ...prev]);
+  // 投稿後に「日記一覧」タブへ移動
+  setActiveTab("diary");
+
+  // TODO: 後でバックエンドAPIに送信してDBに保存する
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
