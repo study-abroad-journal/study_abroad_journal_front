@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import DiaryForm from '@/components/DiaryForm';
 import DiaryMap from '@/components/DiaryMap';
+import DiaryList from '@/components/DiaryList';
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -54,23 +55,34 @@ export default function Home() {
         onLogin={openAuthModal}
         onLogout={handleLogout}
       />
+      
+
       {user ? (
-        // ログイン後の簡単な確認画面。ここの部分にログイン後の画面を実装する
+        // ログイン後の画面
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm p-8">
+              {activeTab === "home" && (
+                <div className="space-y-6">
+                  {/* 入力フォーム */}
+                  <div className="rounded-lg p-8 text-center">
+                    <DiaryForm onSubmit={handleAddEntry} />
+                  </div>
 
-              {/* 今後追加するコンポーネントのプレースホルダー */}
-              <div className="space-y-6">
-                <div className="rounded-lg p-8 text-center">
-                  <DiaryForm onSubmit={handleAddEntry} />
+                  {/* 地図 */}
+                  <div className="rounded-lg p-8 text-center">
+                    <DiaryMap entries={diaryEntries} />
+                  </div>
                 </div>
+              )}
 
-                {/* DiaryMap をフォームの下に配置 */}
-                <div className="rounded-lg p-8 text-center">
-                  <DiaryMap entries={diaryEntries} />
-                </div>
-              </div>
+              {activeTab === "diary" && (
+                <DiaryList entries={diaryEntries} />
+              )}
+
+              {/* {activeTab === "calendar" && (
+                <DiaryCalendar entries={diaryEntries} fullScreen />
+              )} */}
             </div>
           </div>
         </div>
@@ -108,3 +120,5 @@ export default function Home() {
     </div>
   );
 }
+
+
