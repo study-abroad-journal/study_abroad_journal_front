@@ -87,7 +87,16 @@ export default function Home() {
               )}
 
               {activeTab === "diary" && (
-                <DiaryList entries={diaryEntries} />
+                <DiaryList
+                  entries={diaryEntries}
+                  onUpdate={(updatedEntry) => {
+                    setDiaryEntries((prevEntries) =>
+                      prevEntries.map((entry) =>
+                        entry.id === updatedEntry.id ? updatedEntry : entry
+                      )
+                    );
+                  }}
+                />
               )}
 
               {/* {activeTab === "calendar" && (
