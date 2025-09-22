@@ -48,7 +48,7 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
 
   //   try {
   //     if (isLogin) {
-  //       // --- ログイン処理 ---
+  //       // --- ログイン処理 ----
   //       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
   //       handleAuthSuccess(userCredential.user);
   //     } else {
