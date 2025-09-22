@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
 import { DiaryEntry,User } from '@/types';
 import AuthModal from '@/components/AuthModal';
@@ -9,8 +9,22 @@ import { Button } from '@/components/ui/button';
 import DiaryForm from '@/components/DiaryForm';
 import DiaryMap from '@/components/DiaryMap';
 import DiaryList from '@/components/DiaryList';
+import { diaryAPI, DiaryResponse } from "@/lib/api";
 
-
+const convertApiResponseToEntry = (response: DiaryResponse): DiaryEntry => ({
+  id: response.diary_id.toString(),
+  title: response.title,
+  content: response.text,
+  date: new Date(response.created_at).toISOString().split("T")[0],
+  location: {
+    latitude: response.latitude,
+    longitude: response.longitude,
+    address: `緯度: ${response.latitude}, 経度: ${response.longitude}`,
+  },
+  category: response.category_id.toString(),
+  createdAt: response.created_at,
+  updatedAt: response.created_at,
+});
 
 
 export default function Home() {
@@ -19,9 +33,8 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState<'home' | 'diary' | 'calendar'>('home');
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
-  
-  //プルリクテストのためのコメントです。後で消す
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
 
   const openAuthModal = () => {
@@ -36,31 +49,60 @@ export default function Home() {
   // ログイン
   const handleLogin = (userData: User) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
     setShowAuthModal(false);
   };
 
   // ログアウト
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem("user");
     setActiveTab("diary"); // タブをリセット
   };
 
-  function handleAddEntry(entry: Omit<DiaryEntry, 'id'>): void {
-  const newEntry: DiaryEntry = {
-    ...entry,
-    id: Date.now().toString(), // 仮ID
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+  const loadDiaries = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await diaryAPI.getAll();
+      const entries = response.diaries.map(convertApiResponseToEntry);
+      setDiaryEntries(entries);
+    } catch (err) {
+      console.error("Failed to load diaries:", err);
+      setError("日記の読み込みに失敗しました");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  setDiaryEntries((prev) => [newEntry, ...prev]);
-  // 投稿後に「日記一覧」タブへ移動
-  setActiveTab("diary");
+  useEffect(() => {
+    if (user) {
+      loadDiaries();
+    }
+  }, [user]);
 
-  // TODO: 後でバックエンドAPIに送信してDBに保存する
-  }
+  const handleAddEntry = async (entry: Omit<DiaryEntry, "id">) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const apiData = {
+        user_id: 1,
+        title: entry.title,
+        text: entry.content,
+        category_id: parseInt(entry.category) || 1,
+        latitude: entry.location?.latitude || 0,
+        longitude: entry.location?.longitude || 0,
+      };
+
+      const response = await diaryAPI.create(apiData);
+      const newEntry = convertApiResponseToEntry(response);
+      setDiaryEntries((prev) => [newEntry, ...prev]);
+    } catch (err) {
+      console.error("Failed to create diary:", err);
+      setError("日記の作成に失敗しました");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -82,6 +124,18 @@ export default function Home() {
 
               {activeTab === "home" && (
                 <div className="space-y-6">
+                  {error && (
+                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
+
+              {/* ここにローディング表示を追加 */}
+              {loading && (
+                <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+                  処理中...
+                </div>
+              )}
                   {/* 入力フォーム */}
                   <div className="rounded-lg p-8 text-center">
                     <DiaryForm onSubmit={handleAddEntry} />

@@ -64,7 +64,37 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
   //           //以下、この部分にバックエンドにuserの情報を送るコードを書く
 
   //           //↓firebaseのIDを取得するコード
-  //           //const idToken = await auth.currentUser.getIdToken();
+  //           const idToken = await auth.currentUser.getIdToken();
+  //           const newUserPayload = {
+  //             name: formData.name,
+  //             email: formData.email,
+  //             id: auth.currentUser.uid // 必要に応じてUIDも送る
+  //           };
+
+  //           try {
+  //           // バックエンドのユーザー作成エンドポイントにPOSTリクエストを送信
+  //             const response = await fetch('http://localhost:8080/api/users', { // GoのAPIサーバーのURL
+  //               method: 'POST',
+  //               headers: {
+  //                 'Content-Type': 'application/json',
+  //                 'Authorization': `Bearer ${idToken}` // ここで証明書を送る！
+  //               },
+  //             body: JSON.stringify(newUserPayload),
+  //           });
+
+  //             if (!response.ok) {
+  //               // バックエンドでのユーザー作成に失敗した場合のエラーハンドリング
+  //               const errorData = await response.json();
+  //               throw new Error(errorData.message || 'バックエンドでのユーザー作成に失敗しました。');
+  //             }
+
+  //             console.log("バックエンドにユーザー情報を保存しました。");
+
+  //           } catch (backendError) {
+  //               console.error("バックエンドAPIエラー:", backendError);
+  //               setError("ユーザー情報の保存に失敗しました。");
+  //              return; // 処理を中断
+  //             }
 
   //       }
   //       handleAuthSuccess(userCredential.user);
@@ -78,8 +108,8 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
   //   }
   // };
 
-  // ここから後で削除
-  // AuthModal.tsx 内の handleSubmit を差し替え（モックモード）
+//   // ここから後で削除
+//   // AuthModal.tsx 内の handleSubmit を差し替え（モックモード）
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -103,7 +133,7 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
       setLoading(false);
     }
   };
-// ここまで後で削除
+// // ここまで後で削除
 
   // Firebaseのエラーコードを日本語メッセージに変換するヘルパー関数
   const getFirebaseErrorMessage = (errorCode: string): string => {
