@@ -105,6 +105,8 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
               <SelectItem value="友達">友達</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* カテゴリ追加ボタン (まだ未実装) */}
           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
             <span className="text-xl">+</span>
           </div>

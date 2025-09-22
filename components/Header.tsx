@@ -5,8 +5,8 @@ import { User } from '@/types';
 
 interface HeaderProps {
   user: User | null;
-  activeTab: 'diary' | 'calendar';
-  setActiveTab: (tab: 'diary' | 'calendar') => void;
+  activeTab: 'home' | 'diary' | 'calendar';
+  setActiveTab: (tab: 'home' | 'diary' | 'calendar') => void;
   onLogin: () => void;
   onLogout: () => void;
 }
@@ -26,27 +26,35 @@ export default function Header({ user, activeTab, setActiveTab, onLogin, onLogou
           {user && (
             <div className="flex space-x-8">
               <button
-                onClick={() => setActiveTab('diary')}
-                className={`text-sm font-medium pb-4 border-b-2 transition-colors ${
-                  activeTab === 'diary'
+                onClick={() => setActiveTab('home')}
+                className={`text-sm font-medium pb-4 border-b-2 transition-colors ${activeTab === 'home'
                     ? 'text-emerald-500 border-emerald-500'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
+                  }`}
               >
-                日記
+                ホーム
+              </button>
+              <button
+                onClick={() => setActiveTab('diary')}
+                className={`text-sm font-medium pb-4 border-b-2 transition-colors ${activeTab === 'diary'
+                    ? 'text-emerald-500 border-emerald-500'
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+              >
+                日記一覧
               </button>
               <button
                 onClick={() => setActiveTab('calendar')}
-                className={`text-sm font-medium pb-4 border-b-2 transition-colors ${
-                  activeTab === 'calendar'
+                className={`text-sm font-medium pb-4 border-b-2 transition-colors ${activeTab === 'calendar'
                     ? 'text-emerald-500 border-emerald-500'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
+                  }`}
               >
                 カレンダー
               </button>
             </div>
           )}
+
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
