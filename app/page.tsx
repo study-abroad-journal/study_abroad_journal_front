@@ -10,13 +10,19 @@ import DiaryForm from '@/components/DiaryForm';
 import DiaryMap from '@/components/DiaryMap';
 import DiaryList from '@/components/DiaryList';
 
+
+
+
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'home' | 'diary' | 'calendar'>('home');
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   
   //プルリクテストのためのコメントです。後で消す
+
+  
 
   const openAuthModal = () => {
     setShowAuthModal(true);
@@ -25,6 +31,7 @@ export default function Home() {
   const closeAuthModal = () => {
     setShowAuthModal(false);
   };
+
   
   // ログイン
   const handleLogin = (userData: User) => {
@@ -72,6 +79,7 @@ export default function Home() {
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm p-8">
+
               {activeTab === "home" && (
                 <div className="space-y-6">
                   {/* 入力フォーム */}
@@ -118,7 +126,7 @@ export default function Home() {
               <p className="text-lg text-gray-600 mb-8">
                 Start documenting your international experiences
               </p>
-              
+
               <Button
                 onClick={openAuthModal}
                 className="bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white px-8 py-3 text-lg rounded-lg transition-all duration-200 transform hover:scale-105"
@@ -131,13 +139,8 @@ export default function Home() {
       )}
 
       {showAuthModal && (
-        <AuthModal 
-          onClose={closeAuthModal}
-          onLogin={handleLogin}
-        />
+        <AuthModal onClose={closeAuthModal} onLogin={handleLogin} />
       )}
     </div>
   );
 }
-
-
