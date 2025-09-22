@@ -41,98 +41,98 @@ export default function AuthModal({ onClose, onLogin }: AuthModalProps) {
   };
 
 
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setError(null);
+  //   setLoading(true);
+
+  //   try {
+  //     if (isLogin) {
+  //       // --- ログイン処理 ---
+  //       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+  //       handleAuthSuccess(userCredential.user);
+  //     } else {
+  //       // --- サインアップ処理 ---
+  //       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        
+  //       // ユーザープロファイルに名前を更新
+  //       if (auth.currentUser) {
+  //           await updateProfile(auth.currentUser, {
+  //               displayName: formData.name,
+  //           });
+
+  //           //以下、この部分にバックエンドにuserの情報を送るコードを書く
+
+  //           //↓firebaseのIDを取得するコード
+  //           const idToken = await auth.currentUser.getIdToken();
+  //           const newUserPayload = {
+  //             name: formData.name,
+  //             email: formData.email,
+  //             id: auth.currentUser.uid // 必要に応じてUIDも送る
+  //           };
+
+  //           try {
+  //           // バックエンドのユーザー作成エンドポイントにPOSTリクエストを送信
+  //             const response = await fetch('http://localhost:8080/api/users', { // GoのAPIサーバーのURL
+  //               method: 'POST',
+  //               headers: {
+  //                 'Content-Type': 'application/json',
+  //                 'Authorization': `Bearer ${idToken}` // ここで証明書を送る！
+  //               },
+  //             body: JSON.stringify(newUserPayload),
+  //           });
+
+  //             if (!response.ok) {
+  //               // バックエンドでのユーザー作成に失敗した場合のエラーハンドリング
+  //               const errorData = await response.json();
+  //               throw new Error(errorData.message || 'バックエンドでのユーザー作成に失敗しました。');
+  //             }
+
+  //             console.log("バックエンドにユーザー情報を保存しました。");
+
+  //           } catch (backendError) {
+  //               console.error("バックエンドAPIエラー:", backendError);
+  //               setError("ユーザー情報の保存に失敗しました。");
+  //              return; // 処理を中断
+  //             }
+
+  //       }
+  //       handleAuthSuccess(userCredential.user);
+  //     }
+      
+  //   } catch (err: any) {
+  //     console.error("認証エラー:", err.message);
+  //     setError(getFirebaseErrorMessage(err.code));
+  //   } finally {
+  //       setLoading(false);
+  //   }
+  // };
+
+//   // ここから後で削除
+//   // AuthModal.tsx 内の handleSubmit を差し替え（モックモード）
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      if (isLogin) {
-        // --- ログイン処理 ---
-        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-        handleAuthSuccess(userCredential.user);
-      } else {
-        // --- サインアップ処理 ---
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        
-        // ユーザープロファイルに名前を更新
-        if (auth.currentUser) {
-            await updateProfile(auth.currentUser, {
-                displayName: formData.name,
-            });
+      // --- モックユーザー ---
+      const mockUser: User = {
+        id: "mock-123",
+        email: formData.email || "test@example.com",
+        name: formData.name || "テストユーザー",
+      };
 
-            //以下、この部分にバックエンドにuserの情報を送るコードを書く
+      onLogin(mockUser);
+      onClose(); // モーダル閉じる
 
-            //↓firebaseのIDを取得するコード
-            const idToken = await auth.currentUser.getIdToken();
-            const newUserPayload = {
-              name: formData.name,
-              email: formData.email,
-              id: auth.currentUser.uid // 必要に応じてUIDも送る
-            };
-
-            try {
-            // バックエンドのユーザー作成エンドポイントにPOSTリクエストを送信
-              const response = await fetch('http://localhost:8080/api/users', { // GoのAPIサーバーのURL
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${idToken}` // ここで証明書を送る！
-                },
-              body: JSON.stringify(newUserPayload),
-            });
-
-              if (!response.ok) {
-                // バックエンドでのユーザー作成に失敗した場合のエラーハンドリング
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'バックエンドでのユーザー作成に失敗しました。');
-              }
-
-              console.log("バックエンドにユーザー情報を保存しました。");
-
-            } catch (backendError) {
-                console.error("バックエンドAPIエラー:", backendError);
-                setError("ユーザー情報の保存に失敗しました。");
-               return; // 処理を中断
-              }
-
-        }
-        handleAuthSuccess(userCredential.user);
-      }
-      
     } catch (err: any) {
-      console.error("認証エラー:", err.message);
-      setError(getFirebaseErrorMessage(err.code));
+      console.error("モック認証エラー:", err.message);
+      setError("モックログインに失敗しました");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
-
-//   // ここから後で削除
-//   // AuthModal.tsx 内の handleSubmit を差し替え（モックモード）
-//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     setError(null);
-//     setLoading(true);
-
-//     try {
-//       // --- モックユーザー ---
-//       const mockUser: User = {
-//         id: "mock-123",
-//         email: formData.email || "test@example.com",
-//         name: formData.name || "テストユーザー",
-//       };
-
-//       onLogin(mockUser);
-//       onClose(); // モーダル閉じる
-
-//     } catch (err: any) {
-//       console.error("モック認証エラー:", err.message);
-//       setError("モックログインに失敗しました");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 // // ここまで後で削除
 
   // Firebaseのエラーコードを日本語メッセージに変換するヘルパー関数
