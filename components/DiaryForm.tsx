@@ -42,6 +42,11 @@ export default function DiaryForm({
 
     const entry: Omit<DiaryEntry, "id"> = {
       ...formData,
+      location: currentLocation ? {
+        latitude: currentLocation[0],
+        longitude: currentLocation[1],
+        address: `緯度: ${currentLocation[0].toFixed(6)}, 経度: ${currentLocation[1].toFixed(6)}`
+      } : undefined,
       aiCorrection: aiCorrection || undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -58,6 +63,8 @@ export default function DiaryForm({
     });
     setShowAiCorrection(false);
     setAiCorrection("");
+    setCurrentLocation(null);
+    onLocationUpdate?.(null);
   };
 
   const handleAiCorrection = () => {
@@ -164,6 +171,7 @@ export default function DiaryForm({
                       position.coords.longitude,
                     ];
                     setCurrentLocation(location);
+                    onLocationUpdate?.(location);
                     console.log("現在地を取得:", location);
                   },
                   (error) => {
