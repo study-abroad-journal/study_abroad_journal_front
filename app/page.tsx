@@ -36,6 +36,9 @@ export default function Home() {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<
+    [number, number] | null
+  >(null);
 
   const openAuthModal = () => {
     setShowAuthModal(true);
@@ -110,6 +113,11 @@ export default function Home() {
     }
   };
 
+  // 位置情報を保存
+  const handleLocationUpdate = (location: [number, number] | null) => {
+    setCurrentLocation(location);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header を全体に適用 */}
@@ -142,12 +150,18 @@ export default function Home() {
                   )}
                   {/* 入力フォーム */}
                   <div className="rounded-lg p-8 text-center">
-                    <DiaryForm onSubmit={handleAddEntry} />
+                    <DiaryForm
+                      onSubmit={handleAddEntry}
+                      onLocationUpdate={handleLocationUpdate}
+                      currentLocation={currentLocation}
+                    />
                   </div>
 
-                  {/* 地図 */}
                   <div className="rounded-lg p-8 text-center">
-                    <DiaryMap entries={diaryEntries} />
+                    <DiaryMap
+                      entries={diaryEntries}
+                      //currentLocation={currentLocation}
+                    />
                   </div>
 
                   {/* 日記がない場合のメッセージ */}
