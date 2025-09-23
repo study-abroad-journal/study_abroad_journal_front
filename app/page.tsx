@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { BookOpen } from 'lucide-react';
-import { DiaryEntry,User } from '@/types';
-import AuthModal from '@/components/AuthModal';
-import Header from '@/components/Header';
-import { Button } from '@/components/ui/button';
-import DiaryForm from '@/components/DiaryForm';
-import DiaryMap from '@/components/DiaryMap';
-import DiaryList from '@/components/DiaryList';
+import { useState, useEffect } from "react";
+import { BookOpen } from "lucide-react";
+import { DiaryEntry, User } from "@/types";
+import AuthModal from "@/components/AuthModal";
+import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import DiaryForm from "@/components/DiaryForm";
+import DiaryMap from "@/components/DiaryMap";
+import DiaryList from "@/components/DiaryList";
 import { diaryAPI, DiaryResponse } from "@/lib/api";
 
 const convertApiResponseToEntry = (response: DiaryResponse): DiaryEntry => ({
@@ -26,16 +26,16 @@ const convertApiResponseToEntry = (response: DiaryResponse): DiaryEntry => ({
   updatedAt: response.created_at,
 });
 
-
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'home' | 'diary' | 'calendar'>('home');
+  const [activeTab, setActiveTab] = useState<"home" | "diary" | "calendar">(
+    "home"
+  );
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
 
   const openAuthModal = () => {
     setShowAuthModal(true);
@@ -45,7 +45,6 @@ export default function Home() {
     setShowAuthModal(false);
   };
 
-  
   // ログイン
   const handleLogin = (userData: User) => {
     setUser(userData);
@@ -63,8 +62,15 @@ export default function Home() {
       setLoading(true);
       setError(null);
       const response = await diaryAPI.getAll();
-      const entries = response.diaries.map(convertApiResponseToEntry);
-      setDiaryEntries(entries);
+      //const entries = response.diaries.map(convertApiResponseToEntry);
+      //setDiaryEntries(entries);
+      //setDiaryEntries(response.diaries || []);
+      if (response.diaries && Array.isArray(response.diaries)) {
+        const entries = response.diaries.map(convertApiResponseToEntry);
+        setDiaryEntries(entries);
+      } else {
+        setDiaryEntries([]);
+      }
     } catch (err) {
       console.error("Failed to load diaries:", err);
       setError("日記の読み込みに失敗しました");
@@ -114,28 +120,26 @@ export default function Home() {
         onLogin={openAuthModal}
         onLogout={handleLogout}
       />
-      
 
       {user ? (
         // ログイン後の画面
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm p-8">
-
               {activeTab === "home" && (
                 <div className="space-y-6">
                   {error && (
-                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {error}
-                </div>
-              )}
+                    <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                      {error}
+                    </div>
+                  )}
 
-              {/* ここにローディング表示を追加 */}
-              {loading && (
-                <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-                  処理中...
-                </div>
-              )}
+                  {/* ここにローディング表示を追加 */}
+                  {loading && (
+                    <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+                      処理中...
+                    </div>
+                  )}
                   {/* 入力フォーム */}
                   <div className="rounded-lg p-8 text-center">
                     <DiaryForm onSubmit={handleAddEntry} />
@@ -145,6 +149,13 @@ export default function Home() {
                   <div className="rounded-lg p-8 text-center">
                     <DiaryMap entries={diaryEntries} />
                   </div>
+
+                  {/* 日記がない場合のメッセージ */}
+                  {diaryEntries.length === 0 && !loading && (
+                    <div className="text-center py-8 text-gray-500">
+                      まだ日記がありません。上のフォームから最初の日記を作成してみましょう！
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -170,7 +181,6 @@ export default function Home() {
       ) : (
         // メインランディングページ
         <>
-
           {/* メインコンテンツ */}
           <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
             <div className="text-center max-w-lg mx-auto px-4">
