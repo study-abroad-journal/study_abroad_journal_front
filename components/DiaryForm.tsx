@@ -23,7 +23,6 @@ interface DiaryFormProps {
 export default function DiaryForm({
   onSubmit,
   onLocationUpdate,
-  currentLocation,
 }: DiaryFormProps) {
   const [formData, setFormData] = useState({
     title: "",
@@ -33,6 +32,10 @@ export default function DiaryForm({
   });
   const [showAiCorrection, setShowAiCorrection] = useState(false);
   const [aiCorrection, setAiCorrection] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<
+    [number, number] | null
+  >(null);
+  const [locationError, setLocationError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,18 +153,22 @@ export default function DiaryForm({
             type="button"
             variant="outline"
             onClick={() => {
-              console.log("ボタンがクリックされました");
+              console.log("位置情報取得開始");
+              setLocationError("");
+
               if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                   (position) => {
-                    console.log(
-                      "現在地:",
+                    const location: [number, number] = [
                       position.coords.latitude,
-                      position.coords.longitude
-                    );
+                      position.coords.longitude,
+                    ];
+                    setCurrentLocation(location);
+                    console.log("現在地を取得:", location);
                   },
                   (error) => {
                     console.log("エラー:", error.message);
+                    setLocationError("位置情報の取得に失敗しました");
                   }
                 );
               } else {
@@ -174,6 +181,16 @@ export default function DiaryForm({
             <span>位置情報取得</span>
           </Button>
         </div>
+        {locationError && (
+          <div className="text-red-600 text-sm mt-2">{locationError}</div>
+        )}
+
+        {currentLocation && (
+          <div className="text-green-600 text-sm mt-2">
+            現在地: 緯度 {currentLocation[0].toFixed(6)}, 経度{" "}
+            {currentLocation[1].toFixed(6)}
+          </div>
+        )}
 
         {showAiCorrection && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
