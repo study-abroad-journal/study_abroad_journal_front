@@ -164,12 +164,16 @@ export default function DiaryForm({
               setLocationError("");
 
               if (navigator.geolocation) {
+                console.log("if突入")
                 navigator.geolocation.getCurrentPosition(
                   (position) => {
+                    console.log("position突入")
                     const location: [number, number] = [
                       position.coords.latitude,
-                      position.coords.longitude,
+                      position.
+                      coords.longitude,
                     ];
+                    console.log("getcurrentposition突入")
                     setCurrentLocation(location);
                     onLocationUpdate?.(location);
                     console.log("現在地を取得:", location);
@@ -177,6 +181,10 @@ export default function DiaryForm({
                   (error) => {
                     console.log("エラー:", error.message);
                     setLocationError("位置情報の取得に失敗しました");
+                  },
+                  {
+                    maximumAge: 0,
+                    enableHighAccuracy: true,
                   }
                 );
               } else {

@@ -1,11 +1,12 @@
 "use client";
 
-import React from 'react';
+import React,{useEffect} from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { MapPin, Calendar } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DiaryEntry } from '@/types';
+
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -27,6 +28,23 @@ export default function DiaryMap({ entries }: DiaryMapProps) {
 
   const initialPosition: L.LatLngTuple = [35.6809591, 139.7673068];
   const initialZoom = 12;
+
+  useEffect(() => {
+    // entriesの中からIDとlocationだけを抜き出した新しい配列を作成
+    const locations = entries.map(entry => ({
+      id: entry.id,
+      title: entry.title,
+      location: entry.location
+    }));
+
+    // 作成した配列をコンソールに出力
+    console.log("📍 DiaryMapに渡された位置情報一覧:", locations);
+
+    // 見やすいテーブル形式で表示したい場合はこちらを使います
+    // console.table(locations);
+
+  }, [entries]); // entriesが変更されるたびにこの処理が実行される
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="bg-gradient-to-r from-emerald-400 to-blue-500 p-4 text-white">
@@ -53,7 +71,23 @@ export default function DiaryMap({ entries }: DiaryMapProps) {
                 position={[entry.location!.latitude, entry.location!.longitude]}
               >
                 <Popup>
-                  <b>{entry.title}</b>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column', 
+                    gap: '8px'
+                    }}>
+                    <strong>{entry.title}</strong>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span>{entry.date}</span>
+                      <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                        {entry.category}
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, color: '#555' }}>
+                      {entry.content.substring(0, 20)}...
+                    </p>
+                  </div>
                 </Popup>
               </Marker>
             ))
