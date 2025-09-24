@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DiaryEntry } from '@/types';
 
+
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 let DefaultIcon = L.icon({
@@ -70,7 +71,23 @@ export default function DiaryMap({ entries }: DiaryMapProps) {
                 position={[entry.location!.latitude, entry.location!.longitude]}
               >
                 <Popup>
-                  <b>{entry.title}</b>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column', 
+                    gap: '8px'
+                    }}>
+                    <strong>{entry.title}</strong>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span>{entry.date}</span>
+                      <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                        {entry.category}
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, color: '#555' }}>
+                      {entry.content.substring(0, 20)}...
+                    </p>
+                  </div>
                 </Popup>
               </Marker>
             ))
