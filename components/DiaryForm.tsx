@@ -1,48 +1,70 @@
 "use client";
 
-import { useState } from 'react';
-import { MapPin, Mic, Camera, Calendar } from 'lucide-react';
-import { DiaryEntry } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from "react";
+import { MapPin, Mic, Camera, Calendar } from "lucide-react";
+import { DiaryEntry } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DiaryFormProps {
-  onSubmit: (entry: Omit<DiaryEntry, 'id'>) => void;
+  onSubmit: (entry: Omit<DiaryEntry, "id">) => void;
+  onLocationUpdate?: (location: [number, number] | null) => void;
+  currentLocation?: [number, number] | null;
 }
 
-export default function DiaryForm({ onSubmit }: DiaryFormProps) {
+export default function DiaryForm({
+  onSubmit,
+  onLocationUpdate,
+}: DiaryFormProps) {
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    date: new Date().toISOString().split('T')[0],
-    category: '日常',
+    title: "",
+    content: "",
+    date: new Date().toISOString().split("T")[0],
+    category: "日常",
   });
   const [showAiCorrection, setShowAiCorrection] = useState(false);
-  const [aiCorrection, setAiCorrection] = useState('');
+  const [aiCorrection, setAiCorrection] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<
+    [number, number] | null
+  >(null);
+  const [locationError, setLocationError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const entry: Omit<DiaryEntry, 'id'> = {
+
+    const entry: Omit<DiaryEntry, "id"> = {
       ...formData,
+      location: currentLocation ? {
+        latitude: currentLocation[0],
+        longitude: currentLocation[1],
+        address: `緯度: ${currentLocation[0].toFixed(6)}, 経度: ${currentLocation[1].toFixed(6)}`
+      } : undefined,
       aiCorrection: aiCorrection || undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     onSubmit(entry);
-    
+
     // Reset form
     setFormData({
-      title: '',
-      content: '',
-      date: new Date().toISOString().split('T')[0],
-      category: '日常',
+      title: "",
+      content: "",
+      date: new Date().toISOString().split("T")[0],
+      category: "日常",
     });
     setShowAiCorrection(false);
-    setAiCorrection('');
+    setAiCorrection("");
+    setCurrentLocation(null);
+    onLocationUpdate?.(null);
   };
 
   const handleAiCorrection = () => {
@@ -53,7 +75,9 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
     setShowAiCorrection(true);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -64,7 +88,9 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-center space-x-2 mb-6">
         <Camera className="h-5 w-5 text-emerald-500" />
-        <h2 className="text-lg font-medium text-gray-800">Write Your Daily Experience</h2>
+        <h2 className="text-lg font-medium text-gray-800">
+          Write Your Daily Experience
+        </h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -93,7 +119,12 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+          <Select
+            value={formData.category}
+            onValueChange={(value) =>
+              setFormData({ ...formData, category: value })
+            }
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="カテゴリ" />
             </SelectTrigger>
@@ -128,24 +159,52 @@ export default function DiaryForm({ onSubmit }: DiaryFormProps) {
           <Button
             type="button"
             variant="outline"
+            onClick={() => {
+              console.log("位置情報取得開始");
+              setLocationError("");
+
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const location: [number, number] = [
+                      position.coords.latitude,
+                      position.coords.longitude,
+                    ];
+                    setCurrentLocation(location);
+                    onLocationUpdate?.(location);
+                    console.log("現在地を取得:", location);
+                  },
+                  (error) => {
+                    console.log("エラー:", error.message);
+                    setLocationError("位置情報の取得に失敗しました");
+                  }
+                );
+              } else {
+                console.log("位置情報がサポートされていません");
+              }
+            }}
             className="flex items-center space-x-2 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
           >
             <MapPin className="h-4 w-4" />
             <span>位置情報取得</span>
           </Button>
-          {/* <Button
-            type="button"
-            onClick={() => setShowManualInput(!showManualInput)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Search className="h-4 w-4" />
-            <span>地名検索</span>
-          </Button> */}
         </div>
+        {locationError && (
+          <div className="text-red-600 text-sm mt-2">{locationError}</div>
+        )}
+
+        {currentLocation && (
+          <div className="text-green-600 text-sm mt-2">
+            現在地: 緯度 {currentLocation[0].toFixed(6)}, 経度{" "}
+            {currentLocation[1].toFixed(6)}
+          </div>
+        )}
 
         {showAiCorrection && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-medium text-blue-800 mb-2">AI Correction Results</h3>
+            <h3 className="font-medium text-blue-800 mb-2">
+              AI Correction Results
+            </h3>
             <div className="text-sm text-blue-700 whitespace-pre-line">
               {aiCorrection}
             </div>
