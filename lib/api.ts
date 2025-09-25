@@ -1,6 +1,7 @@
 // lib/api.ts
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
+
 export interface DiaryData {
   user_id: number;
   title: string;
@@ -108,3 +109,4 @@ export const diaryAPI = {
     return response.json();
   },
 };
+

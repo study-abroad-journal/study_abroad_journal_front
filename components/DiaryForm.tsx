@@ -67,12 +67,47 @@ export default function DiaryForm({
     onLocationUpdate?.(null);
   };
 
-  const handleAiCorrection = () => {
-    // Mock AI correction
-    setAiCorrection(
-      `AI Correction: "${formData.content}"\n\nSuggested improvements:\n- Consider using more specific adjectives\n- Grammar looks good!\n- Try adding more descriptive details about your experience.`
-    );
-    setShowAiCorrection(true);
+  const [isCorrecting, setIsCorrecting] = useState(false); // AI添削中のローディング状態
+  const [aiCorrectedText, setAiCorrectedText] = useState(""); // AIによる添削後の文章
+  const [aiFeedback, setAiFeedback] = useState(""); // AIからのフィードバック
+  const [correctionError, setCorrectionError] = useState(""); // エラーメッセージ
+
+  const handleAiCorrection = async () => {
+    setIsCorrecting(true);
+    setCorrectionError("");
+    setAiCorrectedText("");
+    setAiFeedback("");
+
+    try {
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: formData.content }),
+      });
+
+      if (!response.ok) {
+        throw new Error("AIの添削に失敗しました。");
+      }
+
+      const data = await response.json();
+      
+      // レスポンスを整形して表示用の文字列を作成
+      const formattedFeedback = `Suggested improvements:\n${data.feedback}`;
+      console.log(data)
+
+      setAiCorrectedText(data.correctedText);
+      setAiFeedback(formattedFeedback);
+      setShowAiCorrection(true)
+
+    } catch (error) {
+      setCorrectionError(
+        error instanceof Error ? error.message : "不明なエラーが発生しました。"
+      );
+    } finally {
+      setIsCorrecting(false);
+    }
   };
 
   const handleInputChange = (
@@ -209,14 +244,37 @@ export default function DiaryForm({
         )}
 
         {showAiCorrection && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 space-y-4">
+          <div>
             <h3 className="font-medium text-blue-800 mb-2">
-              AI Correction Results
+              AIによる修正案
+            </h3>
+            <blockquote className="text-sm text-blue-900 bg-blue-100 p-3 rounded-md italic border-l-4 border-blue-300">
+              {aiCorrectedText}
+            </blockquote>
+          </div>
+          <div>
+            <h3 className="font-medium text-blue-800 mb-2">
+              フィードバック
             </h3>
             <div className="text-sm text-blue-700 whitespace-pre-line">
-              {aiCorrection}
+              <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
+                {aiFeedback
+                  .split(',') // 文字列を改行で分割して配列にする
+                  .filter(item => item.trim() !== '') // 空の行を除外する
+                  .map((item, index) => (
+                    <li key={index}>
+                      {item.replace(/^- |^\* /, '')} {/* 先頭のハイフンなどを削除 */}
+                    </li>
+                  ))
+                }
+              </ul>
             </div>
           </div>
+        </div>
+        )}
+        {correctionError && (
+          <div className="text-red-600 text-sm mb-4">{correctionError}</div>
         )}
 
         <div className="space-y-3">
@@ -226,7 +284,7 @@ export default function DiaryForm({
             disabled={!formData.content.trim()}
             className="w-full bg-gradient-to-r from-purple-400 to-blue-400 hover:from-purple-500 hover:to-blue-500 text-white"
           >
-            Submit for AI Correction
+            {isCorrecting ? "添削中..." : "Submit for AI Correction"}
           </Button>
           <Button
             type="submit"
