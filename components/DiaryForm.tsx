@@ -258,7 +258,17 @@ export default function DiaryForm({
               フィードバック
             </h3>
             <div className="text-sm text-blue-700 whitespace-pre-line">
-              {aiFeedback}
+              <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
+                {aiFeedback
+                  .split(',') // 文字列を改行で分割して配列にする
+                  .filter(item => item.trim() !== '') // 空の行を除外する
+                  .map((item, index) => (
+                    <li key={index}>
+                      {item.replace(/^- |^\* /, '')} {/* 先頭のハイフンなどを削除 */}
+                    </li>
+                  ))
+                }
+              </ul>
             </div>
           </div>
         </div>

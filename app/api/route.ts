@@ -1,42 +1,31 @@
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 
-/**
- * OpenAIクライアントの初期化
- * APIキーは .env.local ファイルから自動的に読み込まれます。
- */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-/**
- * POSTリクエストを処理するAPIエンドポイント
- * フロントエンドからの添削リクエストを受け付けます。
- */
 export async function POST(request: Request) {
-  // サーバー側のターミナルにログを出力して、リクエストが届いたことを確認
-  console.log("AI correction API was called.");
-
+  
   try {
     // フロントエンドから送信されたJSONボディから text を取り出す
     const { text } = await request.json();
 
-    // text が空の場合はエラーを返す
     if (!text) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
     // AIに送信する指示（プロンプト）
     const prompt = `
-      You are an expert English grammar and style corrector.
-      Your task is to correct the given text and provide feedback.
-      Please return your response as a single JSON object with two keys:
-      1. "correctedText": A string containing the fully corrected version of the text.
-      2. "feedback": A string containing a brief, bulleted list of the key improvements.
+      あなたは優秀な多言語の文法・スタイル添削者です。
+      与えられたテキストを添削し、フィードバックを提供してください。フィードバックを与える相手はその言語を学習している途上の人であることを想定し、その人の学習レベルはテキストから見極めてください。
+      レスポンスは必ず単一のJSONオブジェクトで、以下の2つのキーを持つ形式で返してください。
+      1. "correctedText": 元の言語のまま、完全に添削されたテキスト文字列。
+      2. "feedback": 日本語で、改善点を簡潔にまとめた箇条書きの文字列。
 
-      Do not include any text outside of the JSON object.
+      このJSONオブジェクト以外には、何も含めないでください。
 
-      The text to correct is:
+      添削するテキスト:
       "${text}"
     `;
 
@@ -53,7 +42,6 @@ export async function POST(request: Request) {
       throw new Error("No response content from OpenAI.");
     }
 
-    // OpenAIからのレスポンス(文字列)をJSONとしてパースしてフロントに返す
     return NextResponse.json(JSON.parse(result));
 
   } catch (error) {
