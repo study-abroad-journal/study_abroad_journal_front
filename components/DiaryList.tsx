@@ -4,6 +4,8 @@ import { DiaryEntry } from "@/types";
 import { useState } from "react";
 import DiaryModal from "./DiaryModal";
 
+import { getCategoryNameById } from "@/lib/utils";
+
 interface DiaryListProps {
   entries: DiaryEntry[];
   onUpdate: (updated: DiaryEntry) => void; // 更新後に親の state を更新する
@@ -38,7 +40,7 @@ export default function DiaryList({ entries, onUpdate }: DiaryListProps) {
                 {new Date(entry.date).getDate()}日
               </span>
               <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                {entry.category}
+                {getCategoryNameById(entry.category)}
               </span>
             </div>
             <h3 className="font-medium text-gray-900">{entry.title}</h3>

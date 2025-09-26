@@ -6,6 +6,7 @@ import { MapPin, Calendar } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DiaryEntry } from '@/types';
+import { getCategoryNameById } from '@/lib/utils';
 
 
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -81,7 +82,7 @@ export default function DiaryMap({ entries }: DiaryMapProps) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <span>{entry.date}</span>
                       <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                        {entry.category}
+                        {getCategoryNameById(entry.category)}
                       </span>
                     </div>
                     <p style={{ margin: 0, color: '#555' }}>

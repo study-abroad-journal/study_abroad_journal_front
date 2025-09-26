@@ -7,9 +7,17 @@ import AuthModal from "@/components/AuthModal";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import DiaryForm from "@/components/DiaryForm";
-import DiaryMap from "@/components/DiaryMap";
+
 import DiaryList from "@/components/DiaryList";
 import { diaryAPI, DiaryResponse } from "@/lib/api";
+
+import dynamic from 'next/dynamic';
+
+// DiaryMapを動的にインポートし、SSRを無効にする。これをしないと謎の再読み込みが生じた
+const DiaryMap = dynamic(() => import('@/components/DiaryMap'), { 
+  ssr: false,
+  loading: () => <p>Loading map...</p> // ローディング中の表示
+});
 
 const convertApiResponseToEntry = (response: DiaryResponse): DiaryEntry => ({
   id: response.diary_id.toString(),

@@ -17,6 +17,8 @@ interface DiaryModalProps {
   onUpdate: (updated: DiaryEntry) => void; // 親に変更を伝える
 }
 
+import { getCategoryNameById } from "@/lib/utils";
+
 export default function DiaryModal({ entry, onClose, onUpdate }: DiaryModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
@@ -65,7 +67,7 @@ export default function DiaryModal({ entry, onClose, onUpdate }: DiaryModalProps
           <>
             {/* 詳細表示 */}
             <h2 className="text-xl font-bold mb-2">{entry.title}</h2>
-            <p className="text-sm text-gray-500 mb-1">{entry.category}</p>
+            <p className="text-sm text-gray-500 mb-1">{getCategoryNameById(entry.category)}</p>
             <p className="text-gray-700 whitespace-pre-line">{entry.content}</p>
 
             {/* 編集ボタン */}
