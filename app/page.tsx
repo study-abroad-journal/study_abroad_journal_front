@@ -140,7 +140,8 @@ export default function Home() {
       {user ? (
         // ログイン後の画面
         <div className="p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full sm:max-w-4xl sm:mx-auto">
+
             <div className="bg-white rounded-lg shadow-sm p-8">
               {activeTab === "home" && (
                 <div className="space-y-6">
@@ -157,7 +158,9 @@ export default function Home() {
                     </div>
                   )}
                   {/* 入力フォーム */}
-                  <div className="rounded-lg p-8 text-center">
+                  
+                  
+                  <div className="w-full h-auto sm:h-auto">
                     <DiaryForm
                       onSubmit={handleAddEntry}
                       onLocationUpdate={handleLocationUpdate}
@@ -165,7 +168,8 @@ export default function Home() {
                     />
                   </div>
 
-                  <div className="rounded-lg p-8 text-center">
+                  
+                  <div className="w-full h-[300px] sm:h-[400px]">
                     <DiaryMap
                       entries={diaryEntries}
                       //currentLocation={currentLocation}
@@ -203,19 +207,18 @@ export default function Home() {
       ) : (
         // メインランディングページ
         <>
-          {/* メインコンテンツ */}
-          <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-            <div className="text-center max-w-lg mx-auto px-4">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] px-4">
+            <div className="text-center max-w-lg mx-auto">
+              <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
                 Welcome to Study Abroad Journal
               </h1>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-base sm:text-lg text-gray-600 mb-8">
                 Start documenting your international experiences
               </p>
 
               <Button
                 onClick={openAuthModal}
-                className="bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white px-8 py-3 text-lg rounded-lg transition-all duration-200 transform hover:scale-105"
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white px-6 sm:px-8 py-3 text-lg rounded-lg transition-all duration-200 transform hover:scale-105"
               >
                 Get Started
               </Button>
