@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 
 interface DiaryFormProps {
-  onSubmit: (entry: Omit<DiaryEntry, "id">) => void;
+  onSubmit: (entry: Omit<DiaryEntry, "id">) => Promise<void>;
   onLocationUpdate?: (location: [number, number] | null) => void;
   currentLocation?: [number, number] | null;
 }
@@ -37,7 +37,7 @@ export default function DiaryForm({
   >(null);
   const [locationError, setLocationError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const entry: Omit<DiaryEntry, "id"> = {
@@ -51,22 +51,29 @@ export default function DiaryForm({
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+  try{
+    await onSubmit(entry);
 
-    onSubmit(entry);
-
-    // Reset form
-    setFormData({
-      title: "",
-      content: "",
-      date: new Date().toISOString().split("T")[0],
-      category: "日常",
-    });
-    setShowAiCorrection(false);
-    setAiCorrection("");
-    setCurrentLocation(null);
-    onLocationUpdate?.(null);
+      // Reset form
+      setFormData({
+        title: "",
+        content: "",
+        date: new Date().toISOString().split("T")[0],
+        category: "日常",
+      });
+      setShowAiCorrection(false);
+      setAiCorrection("");
+      setCurrentLocation(null);
+      onLocationUpdate?.(null);
+    }catch(error){
+      console.error("Submission failed:", error);
+      alert("投稿に失敗しました。");
+    }finally{
+      setIsSubmitting(false);
+    }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCorrecting, setIsCorrecting] = useState(false); // AI添削中のローディング状態
   const [aiCorrectedText, setAiCorrectedText] = useState(""); // AIによる添削後の文章
   const [aiFeedback, setAiFeedback] = useState(""); // AIからのフィードバック
@@ -288,9 +295,10 @@ export default function DiaryForm({
           </Button>
           <Button
             type="submit"
+            disabled={isSubmitting || isCorrecting}
             className="w-full bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white"
           >
-            投稿する
+            {isSubmitting ? "投稿中..." : "投稿する"}
           </Button>
         </div>
       </form>

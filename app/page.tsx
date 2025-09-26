@@ -89,28 +89,27 @@ export default function Home() {
   }, [user]);
 
   const handleAddEntry = async (entry: Omit<DiaryEntry, "id">) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const apiData = {
-        user_id: 1,
-        title: entry.title,
-        text: entry.content,
-        category_id: parseInt(entry.category) || 1,
-        latitude: entry.location?.latitude || 0,
-        longitude: entry.location?.longitude || 0,
-      };
-
-      const response = await diaryAPI.create(apiData);
-      const newEntry = convertApiResponseToEntry(response);
-      setDiaryEntries((prev) => [newEntry, ...prev]);
-    } catch (err) {
-      console.error("Failed to create diary:", err);
-      setError("日記の作成に失敗しました");
-    } finally {
-      setLoading(false);
+    console.log("Submitting to backend:", entry);
+    const payload = {
+      ...entry,
+      user_id: user?.id
     }
+    
+    // バックエンドへのfetch処理
+    const response = await fetch('/api/diary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      // エラーが起きたら例外を投げる -> DiaryFormのcatchブロックで捕捉される
+      throw new Error('Failed to post diary');
+    }
+
+    const createdDiary = await response.json();
+    console.log("Successfully created:", createdDiary);
+    // ここで日記リストを更新するなどの処理を行う
   };
 
   // 位置情報を保存
